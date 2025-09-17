@@ -111,7 +111,7 @@ class CADIXDetector(threading.Thread):
     # ----------------------------
     def _init_camera(self):
         try:
-            idx = int(getattr(self.config.camera, "index", 0))
+            idx = self.config.camera.index
 
             if platform.system().lower().startswith("win"):
                 api = cv.CAP_MSMF
@@ -129,27 +129,39 @@ class CADIXDetector(threading.Thread):
                     cap = cv.VideoCapture(k, api)
                     if cap.isOpened():
                         idx = k
+                        self.logger.info(f"Cámara encontrada en índice {k}")
                         break
 
             if not cap.isOpened():
                 raise RuntimeError("No se pudo abrir ninguna cámara")
 
-            cap.set(cv.CAP_PROP_FPS, int(getattr(self.config.camera, "fps", 30)))
-            cap.set(cv.CAP_PROP_FRAME_WIDTH, int(getattr(self.config.camera, "width", 1280)))
-            cap.set(cv.CAP_PROP_FRAME_HEIGHT, int(getattr(self.config.camera, "height", 720)))
+            # Configurar propiedades de la cámara
+            cap.set(cv.CAP_PROP_FPS, self.config.camera.fps)
+            cap.set(cv.CAP_PROP_FRAME_WIDTH, self.config.camera.width)
+            cap.set(cv.CAP_PROP_FRAME_HEIGHT, self.config.camera.height)
+            
+            # Configurar buffer si está disponible
+            if hasattr(self.config.camera, 'buffer_size'):
+                cap.set(cv.CAP_PROP_BUFFERSIZE, self.config.camera.buffer_size)
 
-            buf = getattr(self.config.camera, "buffersize", None)
-            if buf is not None:
-                try:
-                    cap.set(cv.CAP_PROP_BUFFERSIZE, int(buf))
-                except Exception:
-                    pass
+            # Verificar que la cámara esté funcionando
+            ret, test_frame = cap.read()
+            if not ret or test_frame is None:
+                raise RuntimeError("La cámara no puede capturar frames")
 
             self.cap = cap
-            self.status_cb(f"Cámara abierta (index={idx})")
+            
+            # Obtener propiedades reales de la cámara
+            actual_width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+            actual_height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+            actual_fps = cap.get(cv.CAP_PROP_FPS)
+            
+            self.logger.info(f"Cámara inicializada: {actual_width}x{actual_height} @ {actual_fps:.1f}fps")
+            self.status_cb(f"Cámara abierta (index={idx}, {actual_width}x{actual_height})")
 
         except Exception as e:
             self.logger.error(f"Error iniciando cámara: {e}")
+            self.status_cb(f"Error: {str(e)}")
             raise
 
     # ----------------------------

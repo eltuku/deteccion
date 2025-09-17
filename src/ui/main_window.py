@@ -55,6 +55,7 @@ class CADIXMainWindow:
         self.refractory_entry.insert(0, str(self.config.oneshot.refractory_frames))
 
         # Botones principales
+        ctk.CTkButton(config_frame, text="Probar Cámara", command=self._test_camera).pack(pady=5)
         ctk.CTkButton(config_frame, text="Guardar Configuración", command=self._save_config).pack(pady=5)
         ctk.CTkButton(config_frame, text="Iniciar Detector", command=self._start_detector).pack(pady=5)
         ctk.CTkButton(config_frame, text="Detener Detector", command=self._stop_detector).pack(pady=5)
@@ -75,10 +76,11 @@ class CADIXMainWindow:
             self.config.oneshot.freeze_after_shot = bool(self.freeze_var.get())
             self.config.oneshot.refractory_frames = int(self.refractory_entry.get())
             self.config_manager.save_config(self.config)
-            messagebox.showinfo("Éxito", "Configuración guardada correctamente.")
+            self.logger.info("Configuración guardada correctamente")
+            return True
         except Exception as e:
-            messagebox.showerror("Error", f"No se pudo guardar configuración: {e}")
             self.logger.error(f"No se pudo guardar configuración: {e}")
+            return False
 
     def _toggle_freeze(self):
         """Actualiza la opción de congelar medición one-shot en la config"""
@@ -93,6 +95,9 @@ class CADIXMainWindow:
             messagebox.showwarning("Advertencia", "El detector ya está en ejecución.")
             return
         try:
+            # Guardar configuración antes de iniciar
+            self._save_config()
+            
             # Import dinámico aquí para evitar ciclos y mostrar errores reales de detector.py
             from src.core.detector import CADIXDetector
 
@@ -104,10 +109,11 @@ class CADIXMainWindow:
                 shot_callback=self._on_shot
             )
             self.detector.start()
-            self.status_label.configure(text="Estado: Detector iniciado")
+            self.status_label.configure(text="Estado: Iniciando detector...")
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo iniciar el detector: {e}")
             self.logger.error(f"No se pudo iniciar el detector: {e}")
+            self.status_label.configure(text="Estado: Error al iniciar")
 
     def _stop_detector(self):
         if self.detector:
@@ -128,10 +134,51 @@ class CADIXMainWindow:
     def _on_shot(self, value, direction, session_id):
         # Registrar en DB
         try:
-            self.db.insert_measurement(value, direction, session_id)
+            self.db.save_oneshot(value, direction, session_id=session_id)
             self.logger.info(f"Medición registrada: {value} mm ({direction})")
         except Exception as e:
             self.logger.error(f"No se pudo registrar medición: {e}")
+    
+    def _test_camera(self):
+        """Prueba la cámara para verificar que funciona"""
+        try:
+            import cv2 as cv
+            import platform
+            
+            idx = self.config.camera.index
+            
+            if platform.system().lower().startswith("win"):
+                api = cv.CAP_MSMF
+            else:
+                api = cv.CAP_ANY
+            
+            cap = cv.VideoCapture(idx, api)
+            
+            if not cap.isOpened():
+                cap = cv.VideoCapture(idx, cv.CAP_ANY)
+            
+            if not cap.isOpened():
+                # Probar otros índices
+                for k in range(1, 4):
+                    cap = cv.VideoCapture(k, api)
+                    if cap.isOpened():
+                        idx = k
+                        break
+            
+            if cap.isOpened():
+                ret, frame = cap.read()
+                if ret and frame is not None:
+                    h, w = frame.shape[:2]
+                    messagebox.showinfo("Éxito", f"Cámara funcionando correctamente\nÍndice: {idx}\nResolución: {w}x{h}")
+                else:
+                    messagebox.showerror("Error", "La cámara no puede capturar frames")
+                cap.release()
+            else:
+                messagebox.showerror("Error", "No se pudo abrir ninguna cámara")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Error probando cámara: {e}")
+            self.logger.error(f"Error probando cámara: {e}")
 
     def run(self):
         self.root.mainloop()
