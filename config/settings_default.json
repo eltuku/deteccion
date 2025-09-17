@@ -1,0 +1,61 @@
+{
+  "camera": {
+    "index": 0,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "buffer_size": 1,
+    "auto_exposure": false,
+    "brightness": 0.0,
+    "contrast": 1.0
+  },
+  "detection": {
+    "model_path": "models/best_y8n.onnx",
+    "input_size": 480,
+    "confidence_threshold": 0.25,
+    "iou_threshold": 0.50,
+    "lock_iou_threshold": 0.35,
+    "lock_max_misses": 10,
+    "lock_smoothing": 0.55
+  },
+  "measurement": {
+    "px_to_mm": 0.86,
+    "margin_fraction": 0.03,
+    "ema_alpha": 0.35,
+    "alert_threshold_mm": 120.0,
+    "alert_cooldown_s": 1.0,
+    "use_ema_for_shots": false
+  },
+  "oneshot": {
+    "gate_x_ratio": 0.50,
+    "gate_y_tolerance_fraction": 0.22,
+    "refractory_frames": 14,
+    "shot_direction": "any"
+  },
+  "image_processing": {
+    "low_light_enhance": true,
+    "clahe_clip_limit": 1.5,
+    "clahe_tile_size": [8, 8],
+    "denoise_on_dark": false
+  },
+  "ui": {
+    "window_width": 1400,
+    "window_height": 900,
+    "video_width": 960,
+    "video_height": 540,
+    "theme": "light",
+    "color_theme": "blue"
+  },
+  "database": {
+    "db_path": "data/cadix.db",
+    "backup_interval_hours": 24,
+    "max_backup_files": 30
+  },
+  "base_dir": "",
+  "data_dir": "data",
+  "logs_dir": "logs",
+  "reports_dir": "reports",
+  "models_dir": "models",
+  "version": "2.0.0",
+  "company": "CADIX Industries"
+}

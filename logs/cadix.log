@@ -1,0 +1,41 @@
+2025-09-17 12:11:29 | CRITICAL | CADIX | Error crítico en aplicación: CADIXMainWindow.__init__() missing 2 required positional arguments: 'config' and 'config_manager'
+2025-09-17 12:11:29 | CRITICAL | CADIX | Traceback (most recent call last):
+  File "C:\Users\disco\Downloads\project_extracted\project\main.py", line 101, in main
+    app = CADIXMainWindow()
+TypeError: CADIXMainWindow.__init__() missing 2 required positional arguments: 'config' and 'config_manager'
+
+2025-09-17 12:13:22 | INFO     | CADIX | Logging iniciado correctamente
+2025-09-17 12:13:22 | CRITICAL | CADIX | Error crítico en aplicación: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'SystemConfig'
+2025-09-17 12:13:22 | CRITICAL | CADIX | Traceback (most recent call last):
+  File "C:\Users\disco\Downloads\project_extracted\project\main.py", line 92, in main
+    app = CADIXMainWindow(config, config_manager)   # <-- PASAMOS ARGUMENTOS
+  File "C:\Users\disco\Downloads\project_extracted\project\src\ui\main_window.py", line 23, in __init__
+    self.db = DatabaseManager(self.config)
+              ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\disco\Downloads\project_extracted\project\src\core\database.py", line 21, in __init__
+    self.db_path = Path(db_path)
+                   ~~~~^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\Lib\pathlib\_local.py", line 503, in __init__
+    super().__init__(*args)
+    ~~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\Lib\pathlib\_local.py", line 132, in __init__
+    raise TypeError(
+    ...<2 lines>...
+        f"not {type(path).__name__!r}")
+TypeError: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'SystemConfig'
+
+2025-09-17 12:15:57 | INFO     | CADIX | Logging iniciado correctamente
+2025-09-17 12:15:57 | INFO     | CADIX | Base de datos inicializada: C:\Users\disco\CADIX\data\cadix.db
+2025-09-17 12:16:04 | ERROR    | CADIX | Error iniciando sesión ONNX: [ONNXRuntimeError] : 3 : NO_SUCHFILE : Load model from models/best_y8n.onnx failed:Load model models/best_y8n.onnx failed. File doesn't exist
+2025-09-17 12:16:12 | ERROR    | CADIX | No se pudo iniciar el detector: [ONNXRuntimeError] : 3 : NO_SUCHFILE : Load model from models/best_y8n.onnx failed:Load model models/best_y8n.onnx failed. File doesn't exist
+2025-09-17 12:16:55 | INFO     | CADIX | Logging iniciado correctamente
+2025-09-17 12:16:55 | INFO     | CADIX | Base de datos inicializada: C:\Users\disco\CADIX\data\cadix.db
+2025-09-17 12:16:57 | INFO     | CADIX | Sesión ONNX OK: models/best_y8n.onnx
+2025-09-17 12:16:57 | ERROR    | CADIX | Error iniciando cámara: 'CameraConfig' object has no attribute 'backend'
+2025-09-17 12:17:13 | ERROR    | CADIX | No se pudo iniciar el detector: 'CameraConfig' object has no attribute 'backend'
+2025-09-17 12:23:50 | INFO     | CADIX | Logging iniciado correctamente
+2025-09-17 12:23:50 | INFO     | CADIX | Base de datos inicializada: C:\Users\disco\CADIX\data\cadix.db
+2025-09-17 12:24:15 | ERROR    | CADIX | No se pudo iniciar el detector: cannot import name 'CADIXDetector' from 'src.core.detector' (C:\Users\disco\Downloads\project_extracted\project\src\core\detector.py)
+2025-09-17 12:29:32 | INFO     | CADIX | Logging iniciado correctamente
+2025-09-17 12:29:32 | INFO     | CADIX | Base de datos inicializada: C:\Users\disco\CADIX\data\cadix.db
+2025-09-17 12:30:04 | ERROR    | CADIX | No se pudo iniciar el detector: invalid syntax (detector.py, line 402)
