@@ -42,11 +42,17 @@ class CADIXMainWindow:
         self.freeze_var = tk.BooleanVar(master=self.root, value=self.config.oneshot.freeze_after_shot)
         freeze_chk = ctk.CTkCheckBox(
             config_frame,
-            text="Congelar medición tras one-shot",
+            text="Medición instantánea (recomendado)",
             variable=self.freeze_var,
             command=lambda: self._toggle_freeze()
         )
         freeze_chk.pack(pady=2)
+        
+        # Período refractario
+        ctk.CTkLabel(config_frame, text="Período refractario (frames)").pack(pady=2)
+        self.refractory_entry = ctk.CTkEntry(config_frame)
+        self.refractory_entry.pack(pady=2)
+        self.refractory_entry.insert(0, str(self.config.oneshot.refractory_frames))
 
         # Botones principales
         ctk.CTkButton(config_frame, text="Guardar Configuración", command=self._save_config).pack(pady=5)
@@ -67,6 +73,7 @@ class CADIXMainWindow:
         try:
             self.config.measurement.px_to_mm = float(self.conversion_entry.get())
             self.config.oneshot.freeze_after_shot = bool(self.freeze_var.get())
+            self.config.oneshot.refractory_frames = int(self.refractory_entry.get())
             self.config_manager.save_config(self.config)
             messagebox.showinfo("Éxito", "Configuración guardada correctamente.")
         except Exception as e:

@@ -47,7 +47,7 @@ class OneShotConfig:
     """Configuración de One-Shot"""
     gate_x_ratio: float = 0.50
     gate_y_tolerance_fraction: float = 0.22
-    refractory_frames: int = 14
+    refractory_frames: int = 30
     shot_direction: str = "any"  # "any", "L2R", "R2L"
     freeze_after_shot: bool = True
     release_lock_after_shot: bool = True

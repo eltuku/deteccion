@@ -399,9 +399,6 @@ class CADIXDetector(threading.Thread):
 
         near_center_y = abs(cy - gate_y) <= y_tol
 
-        if crossed, dir_ok, near_center_y, self.refractory == 0 and mm_dist is not None:
-            # corregido: usar 'and' entre condiciones
-            pass  # placeholder para evitar error si quedara coma por edición
         if crossed and dir_ok and near_center_y and self.refractory == 0 and mm_dist is not None:
             value = float(mm_dist)
             direction = "L2R" if self.prev_center[0] < cx else "R2L"
@@ -412,9 +409,15 @@ class CADIXDetector(threading.Thread):
                 except Exception as e:
                     self.logger.error(f"Error en callback de one-shot: {e}")
 
-            if getattr(self.config.oneshot, "freeze_after_shot", False):
+            # Siempre congelar la medición después del disparo para evitar mediciones continuas
+            if getattr(self.config.oneshot, "freeze_after_shot", True):
                 self.frozen_value = value
-                self.frozen_frames = int(self.config.oneshot.refractory_frames)
+                self.frozen_frames = int(self.config.oneshot.refractory_frames * 2)  # Congelar por más tiempo
+            
+            # Liberar el lock del tracking para permitir nueva detección
+            if getattr(self.config.oneshot, "release_lock_after_shot", True):
+                self.lock_bbox = None
+                self.lock_bbox_smooth = None
 
             self.refractory = int(self.config.oneshot.refractory_frames)
             self.logger.info(f"One-shot disparado: {value:.2f}mm ({direction})")
