@@ -182,7 +182,8 @@ class CADIXDetector(threading.Thread):
 
                 # Inferencia
                 try:
-                    out = self.sess.run([self.output_name], {self.input_name: blob})[0]
+                    outputs = self.sess.run([self.output_name], {self.input_name: blob})
+                    out = outputs[0] if outputs else None
                 except Exception as e:
                     self.logger.error(f"Error en inferencia ONNX: {e}")
                     continue
@@ -265,7 +266,7 @@ class CADIXDetector(threading.Thread):
             if len(det) < 6:
                 continue
             x1, y1, x2, y2, sc, cls = det[:6]
-            if sc < self.config.detection.score_thresh:
+            if sc < self.config.detection.confidence_threshold:
                 continue
 
             # Deshacer letterbox
@@ -531,11 +532,11 @@ class CADIXDetector(threading.Thread):
     # Utilidades
     # ----------------------------
     def _enhance_image(self, bgr):
-        if self.config.image.low_light_enhance:
+        if self.config.image_processing.low_light_enhance:
             lab = cv.cvtColor(bgr, cv.COLOR_BGR2LAB)
             l, a, b = cv.split(lab)
-            clip = max(0.1, float(self.config.image.clahe_clip_limit))
-            tile = self.config.image.clahe_tile_size
+            clip = max(0.1, float(self.config.image_processing.clahe_clip_limit))
+            tile = self.config.image_processing.clahe_tile_size
             clahe = cv.createCLAHE(clipLimit=clip, tileGridSize=tuple(tile))
             cl = clahe.apply(l)
             limg = cv.merge((cl, a, b))
